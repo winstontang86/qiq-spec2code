@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "qiq-spec2code tasks state",
-  "description": "Phase 2 产出的 tasks.json 的结构定义；Phase 3/4 在此基础上更新 status / attempt / last_error。",
+  "description": "Phase 2 产出的 tasks.json 的结构定义；Phase 3/4 在此基础上更新 status / attempt / last_error。Task 启用 additionalProperties:false 与禁用字段守卫（effort / estimateHours / manDays / workload / days / manday / storyPoint / story_point），任一命中即 schema 校验不通过。",
   "type": "object",
   "required": ["spec_path", "generated_at", "tasks"],
   "properties": {
@@ -26,6 +26,7 @@
   "definitions": {
     "Task": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "id",
         "name",
@@ -111,6 +112,21 @@
         {
           "if": { "properties": { "status": { "const": "waived" } } },
           "then": { "required": ["waiver_reason"] }
+        },
+        {
+          "description": "禁止出现任何工作量/工时/人天类字段；拆分粒度只用 estimated_loc",
+          "not": {
+            "anyOf": [
+              { "required": ["effort"] },
+              { "required": ["estimateHours"] },
+              { "required": ["manDays"] },
+              { "required": ["workload"] },
+              { "required": ["days"] },
+              { "required": ["manday"] },
+              { "required": ["storyPoint"] },
+              { "required": ["story_point"] }
+            ]
+          }
         }
       ]
     }

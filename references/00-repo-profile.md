@@ -75,7 +75,7 @@
 
 ### Step 5.5 — 风格基线提炼（**Phase 1 必须沿用**）
 
-把 Step 2~5 的结果**汇总为一张"风格基线表"**，明确写入 `REPO_PROFILE.md` 的"风格基线"小节。基线表是 Phase 1 规格书 §6 编码约束的**唯一引用源**，规格书禁止凭空声明风格选型。
+把 Step 2~5 的结果**汇总为一张"风格基线表"**，明确写入 `REPO_PROFILE.md` 的"风格基线"小节。基线表是 Phase 1 规格书 §9 编码约束的**唯一引用源**，规格书禁止凭空声明风格选型。
 
 基线表至少覆盖：
 
@@ -119,7 +119,12 @@
 
 把结果填入 [@templates/REPO_PROFILE.md](../templates/REPO_PROFILE.md) 的所有章节，写入 `.spec2code/REPO_PROFILE.md`。
 
-**最后必须执行**：把画像核心摘要（语言版本、分层风格、关键依赖选型、绿地/棕地、关键风险）打印给用户，请用户确认或补充。**用户确认前不进入 Phase 1**。
+### Phase 0 完成动作（必须全部执行）
+
+1. 写入 `.spec2code/REPO_PROFILE.md`。
+2. 重写 `.spec2code/PROGRESS.md`（按 [@templates/PROGRESS.md](../templates/PROGRESS.md) 模板），把 Phase 0 状态置为 `done`，下一阶段 Phase 1 状态置为 `pending（等待 approve）`。
+3. 把画像核心摘要（语言版本、分层风格、关键依赖选型、绿地/棕地、关键风险）打印给用户。
+4. **输出统一 STOP & CONFIRM 段**，等待用户 `✅ approve`。**收到 ✅ 之前，禁止调用任何 Phase 1 的工具**。
 
 ## Rules
 

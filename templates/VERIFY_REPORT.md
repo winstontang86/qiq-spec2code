@@ -19,6 +19,13 @@
 - **Minor 数**：{{N}}
 - **Info 数**：{{N}}
 
+**逐轮对账（Re-Verify、仅 Attempt ≥ 2 填写）**：
+
+- 上轮已修复：{{N}} 项 → [MATCH-T009-001, MATCH-T009-003 ...]
+- 仍残留：{{N}} 项 → [MATCH-T009-002 ...]
+- 本轮新增：{{N}} 项 → [MATCH-T009-006 ...]
+- 回归（REGRESSION）：{{N}} 项 → [MATCH-T009-001 ...]
+
 > 严格按以下规则推导结论，不允许主观裁量：
 > - 任一 Block → ❌ Fail
 > - 无 Block 但有 Major → ⚠️ Pass with non-blocking issues（可进入下一 Task，但需在本批次结束前修复）
@@ -140,19 +147,21 @@
 
 ### 10. 问题清单
 
-#### [MATCH-001] [Block]
+> 问题 ID 格式**必须**为 `MATCH-T<task>-<seq>`（如 `MATCH-T009-001`）。多轮校验时同一问题沿用原始序号，新增问题递增。回归问题在序号前加 `[REGRESSION]` 标记，严重程度按 Block 处理。
+
+#### [MATCH-T009-001] [Block]
 
 - **问题类型**：缺失
-- **规格书要求**：§4 Step 6 — 事务失败时调用 `inventoryService.Rollback(ctx, orderNo)`
+- **规格书要求**：§5 Step 6 — 事务失败时调用 `inventoryService.Rollback(ctx, orderNo)`
 - **代码现状**：`order_service.go:160-180` 仅打印日志，未调用 Rollback
 - **差异说明**：库存扣减成功而订单创建失败时未回滚库存，导致库存数据不一致
 - **修复建议**：在事务失败的 `defer` 或返回前增加 `_ = i.inventoryService.Rollback(ctx, orderNo)`，并对回滚失败的情况记录补偿日志（按规格书要求）
-- **影响范围**：影响所有 CreateOrder 失败路径；不影响其他 Task
+- **影响范围**：影响所有 CreateOrder 失败路径；不影响其他任务
 
-#### [MATCH-002] [Major]
+#### [MATCH-T009-002] [Major]
 
 - **问题类型**：约束违反
-- **规格书要求**：§6.B1 — DB 操作 3 秒超时
+- **规格书要求**：§9.2 — DB 操作 3 秒超时
 - **代码现状**：`order_repository_mysql.go:33` 未设置超时，使用 `r.db.WithContext(ctx)` 但 ctx 无 deadline
 - **差异说明**：默认无超时，DB 阻塞会拖慢整条链路
 - **修复建议**：使用 `ctx, cancel := context.WithTimeout(ctx, 3*time.Second); defer cancel()`

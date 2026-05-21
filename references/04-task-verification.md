@@ -50,6 +50,8 @@
 
 按 [@templates/VERIFY_REPORT.md](../templates/VERIFY_REPORT.md) 的骨架填写，写入 `.spec2code/tasks/<Task-ID>/verify_report.md`。
 
+**多轮校验时必须在文件末尾追加 `## Attempt N` 段，禁止覆盖前次内容**；Implementer 重做后下一轮 Verifier 也按此追加。
+
 报告必须包含：
 
 ### 1. 校验概要
@@ -77,18 +79,23 @@
 
 ### 5. 问题清单
 
-每个问题按统一格式：
+每个问题按统一格式，**ID 必须形如 `MATCH-T<task>-<seq>`**（例如 `MATCH-T009-001`），是 Implementer 重试时按位对账的唯一 key：
 
 ```
-### [MATCH-编号] [严重程度: Block/Major/Minor]
+### [MATCH-T<task>-<seq>] [严重程度: Block/Major/Minor]
 
 **问题类型**：缺失 / 不一致 / 额外实现 / 约束违反
-**规格书要求**：[引用规格书原文]
+**规格书要求**：[引用规格书原文 + 章节号]
 **代码现状**：[引用代码 + 行号]
 **差异说明**：[具体描述差异]
 **修复建议**：[如何修改代码以符合规格书]
 **影响范围**：[是否影响其他任务]
 ```
+
+> Re-Verify（重校验）规则：
+> - 当 attempt > 1 时，沿用上一轮的 MATCH-ID（同一问题不能重新编号），新发现的问题在原序号基础上递增。
+> - 上一轮已修复的 MATCH-ID 在本轮报告 §1 校验概要中**显式列出**：「已修复 N 项 / 仍残留 M 项 / 新增 K 项」。
+> - 上一轮已修复但本轮回归（regression）的，标注 `[REGRESSION]` 前缀，严重程度按 Block 处理。
 
 ### 6. 校验结论
 

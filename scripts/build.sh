@@ -35,6 +35,9 @@ if [[ -z "${SKILL_NAME}" ]]; then
     exit 1
 fi
 
+# ---------- frontmatter 中声明的语义版本（可选） ----------
+SKILL_VERSION_DECL="$(awk -F': *' '/^version:/{print $2; exit}' SKILL.md | tr -d '\r' | tr -d ' ')"
+
 # ---------- 版本号：优先 $VERSION，其次 git describe，再次日期戳 ----------
 if [[ -n "${VERSION:-}" ]]; then
     PKG_VERSION="${VERSION}"
@@ -46,6 +49,17 @@ elif git -C "${ROOT_DIR}" rev-parse --git-dir >/dev/null 2>&1; then
     fi
 else
     PKG_VERSION="0.0.0-$(date +%Y%m%d%H%M%S)"
+fi
+
+# ---------- 语义版本与 $VERSION 一致性校验（仅二者同时存在时） ----------
+if [[ -n "${SKILL_VERSION_DECL}" && -n "${VERSION:-}" ]]; then
+    norm_decl="${SKILL_VERSION_DECL#v}"
+    norm_env="${VERSION#v}"
+    if [[ "${norm_decl}" != "${norm_env}" ]]; then
+        echo "[ERROR] SKILL.md frontmatter version=${SKILL_VERSION_DECL} 与 \$VERSION=${VERSION} 不一致" >&2
+        echo "        请调整任一边使之同步后重试（去除 v 前缀后比较）" >&2
+        exit 5
+    fi
 fi
 
 PKG_BASENAME="${SKILL_NAME}-${PKG_VERSION}"

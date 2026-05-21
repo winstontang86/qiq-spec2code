@@ -136,11 +136,57 @@ $ {{golangci-lint run / make lint}}
 
 ---
 
-## 8. 总体结论
+## 8. 反作弊与状态一致性（**强制门禁**）
 
-☐ ✅ **PASS**：构建/测试/抽样/回扫全部通过；可上线
-☐ ⚠️ **PASS_WITH_WAIVER**：存在已登记豁免的 Major 问题；可上线但需后续闭环
-☐ ❌ **FAIL**：构建/测试不通过，或存在未豁免的功能遗漏；不可上线
+### 8.1 SPEC_QUESTION 残留
+
+```
+$ grep -rn "// SPEC_QUESTION:" --include="*.go" .
+{{命令输出 / "0 matches"}}
+```
+
+- 未解决条数：{{N}}（**必须为 0**，否则 FAIL）
+
+### 8.2 attempt ≥ 3 但未通过
+
+- `tasks.json` 中是否存在 `attempt >= 3 && status not in [passed, waived]` 的 Task：☐ 否 ☐ 是
+- 若是，列表：{{T-XXX, T-YYY}}（**任一存在即 FAIL**）
+
+### 8.3 进度状态一致性（PROGRESS.md ↔ tasks.json）
+
+| 比对项 | PROGRESS.md | tasks.json | 一致 |
+|---|---|---|---|
+| Phase 0 状态 | done | done | ✅ |
+| Phase 1 状态 | done | done | ✅ |
+| Phase 2 状态 | done | done | ✅ |
+| Phase 3/4 完成数 | X/N | X/N | ✅ |
+| {{T-001 状态/Attempt}} | passed/1 | passed/1 | ✅ |
+| {{...}} | {{...}} | {{...}} | {{...}} |
+
+任一不一致 → **FAIL**。
+
+### 8.4 SPEC_COVERAGE.md 未覆盖项
+
+- 总数：{{N}}，未覆盖：{{Z}}（**必须 = 0** 或全部已豁免）
+- 未覆盖项列表：{{...}}
+
+### 8.5 TASKS / tasks.json 禁用字段扫描
+
+```
+$ grep -nE "(工作量|工时|估时|人天|story[ _-]?point|effort|estimateHours|manDays|workload)" \
+    .spec2code/TASKS.md .spec2code/state/tasks.json
+{{命令输出 / "0 matches"}}
+```
+
+- 命中条数：{{N}}（**必须为 0**，否则 FAIL）
+
+---
+
+## 9. 总体结论
+
+☐ ✅ **PASS**：§1~§5、§8 全部通过；§6 一致性问题清单仅含 Minor；可上线
+☐ ⚠️ **PASS_WITH_WAIVER**：存在 Major 问题但已在 §7 登记豁免（理由 + Owner + 后续整改时间）；可上线但需后续闭环
+☐ ❌ **FAIL**：构建/测试不通过，或 §8 反作弊任一不通过，或存在未豁免的功能遗漏；不可上线
 
 **上线门禁**：{{允许 / 不允许}}
 
@@ -149,3 +195,13 @@ $ {{golangci-lint run / make lint}}
 **后续动作**：
 
 - {{...}}
+
+---
+
+## ⏸ 等待用户确认
+
+> 本文件为 Phase 5 产物。请回复：
+>
+> - ✅ approve              → 流水线落地完成
+> - 🔧 revise: <反馈>       → 修订集成校验
+> - ❌ reject               → 终止流水线（保留产物）

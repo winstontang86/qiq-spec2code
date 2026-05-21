@@ -58,7 +58,7 @@
 ### Step 2 — 代码实现
 
 - 每个文件单独输出，标注完整文件路径。
-- 关键逻辑添加注释，引用规格书章节（如 `// 规格书 §4 Step 5：库存扣减`）。
+- 关键逻辑添加注释，引用规格书章节（如 `// 规格书 §5 Step 5：库存扣减`）。
 - 异常处理路径添加注释，说明为什么这样处理。
 - 使用编辑工具直接落盘，不要只贴在对话里。
 
@@ -115,7 +115,7 @@ log.Printf("order created: %s", orderNo)
 ```go
 // ✅ 正确：说明"为什么"，引用规格书
 // 使用乐观锁更新，防止并发修改导致数据不一致
-// 规格书 §6 编码约束 - 乐观锁规则
+    // 规格书 §9 编码约束 - 乐观锁规则
 func (r *OrderRepo) Update(ctx context.Context, order *entity.Order) error {
     result := r.db.WithContext(ctx).
         Where("id = ? AND version = ?", order.ID, order.Version).
@@ -146,16 +146,22 @@ func (r *OrderRepo) Update(ctx context.Context, order *entity.Order) error {
 
 如果 Verifier 把 Task 打回（`VERIFY_REPORT.md` 中存在 Block / Major 问题），Coordinator 会把校验报告作为追加上下文给你。此时：
 
-1. 先在 `IMPL_REPORT.md` 顶部记录 `Attempt N` 标题。
-2. 逐条响应 Verifier 的问题：要么修复，要么显式说明"无法修复 + 原因"。无法修复的必须人工检查确认。
-3. 仅修改与问题相关的代码，**不要顺手改其他无关代码**。
-4. 重做一次自检。
+1. 在 `IMPL_REPORT.md` 末尾**追加** `## Attempt N` 章节（不要覆盖前次内容），N 与 VERIFY_REPORT 的当前 Attempt 号保持一致。
+2. **按 `MATCH-T<task>-<seq>` 问题 ID 逐条响应**（这个 ID 是构成循环闭环的关键）：
+   - 每个 ID 一行，标明：「已修复，位置 `file:line`」 / 「无法修复，原因 ...，需人工决策」。
+   - 不允许漏掉任何一个 Block / Major 问题。
+   - 不允许"整段重写"而不一一对账。
+3. **仅修改与问题相关的代码**，不要顺手改其他无关代码（避免引入新问题使下一轮校验失败）。
+4. 重做一次自检（§Step 3 的 `IMPL_REPORT.md`），重点记录：以上哪些 MATCH-ID 已修复、哪些仍待决策。
+
+> 循环依据：本 Task 在第 N 轮 Verifier 仍返 Block 时进入第 N+1 轮；attempt 累计越过 3 则停止流水线，状态置 `failed`，PROGRESS.md 标注 `blocked: T-XXX`。
 
 ## Verification（Implementer 自检清单）
 
 - [ ] 已先输出"任务理解确认"。
 - [ ] 已逐条对照验收标准实现并自检。
 - [ ] 已逐条对照编码约束实现并自检。
+- [ ] **已对照 `tasks.json` 的 `spec_refs` 字段确认本任务覆盖的规格书章节全部落实**。
 - [ ] 字段名、类型、错误码、流程步骤与规格书完全一致。
 - [ ] 所有偏差均已显式记录到 `IMPL_REPORT.md`。
 - [ ] 所有外部 I/O 操作均传 `context.Context` 并设置超时。
@@ -163,3 +169,4 @@ func (r *OrderRepo) Update(ctx context.Context, order *entity.Order) error {
 - [ ] 没有硬编码的魔法数字/配置值。
 - [ ] 单元测试覆盖正常路径与所有异常分支。
 - [ ] `IMPL_REPORT.md` 已写入指定路径。
+- [ ] 重试场景下，已按 `MATCH-T<task>-<seq>` 一一对账响应（IMPL_REPORT §8）。

@@ -14,6 +14,17 @@
 
 ## 拆分原则
 
+### 0. 禁止字段（违反即不合格）
+
+Task 描述与 `tasks.json` 中**绝对禁止**出现以下字段（与拆分粒度无关，引入主观估算偏差）：
+
+```
+工作量 / 工时 / 估时 / X 天 / X 人天 / story point
+effort / estimateHours / manDays / workload / days / manday / storyPoint / story_point
+```
+
+拆分粒度只用"代码量预估 + 依赖深度"衡量，工作量估算是项目管理职责，不是 spec2code 职责。
+
 ### 1. 单一职责
 
 每个任务只做一件事。一个任务**禁止**同时涉及：
@@ -57,7 +68,7 @@
 - **仓库已有 DDD 分层** → 直接套用 `domain → repository → infrastructure → application → interfaces` 五层顺序。
 - **仓库已有 Clean Arch** → 套用 `entity → usecase → adapter → infrastructure` 顺序。
 - **仓库已有 MVC** → 套用 `model → dao → service → controller` 顺序。
-- **仓库已有 Flat / Mixed** → 不强行套层级，按规格书 §5 的依赖图拆分；产出文件路径必须**落到仓库已有的同类目录**，不要新建一套。
+- **仓库已有 Flat / Mixed** → 不强行套层级，按规格书 §7 的依赖图拆分；产出文件路径必须**落到仓库已有的同类目录**，不要新建一套。
 - **绿地项目** → 按规格书 §1 设计的目录从 0 拆分。
 
 > 关键原则：**Task 的产出文件路径必须先在 `REPO_PROFILE.md` 的目录表中能找到归属**；找不到归属的文件必须显式标注"新增目录"并在该 Task 的描述中说明原因。
@@ -151,7 +162,7 @@
 > - **参考仓库已有模块**：`internal/user/application/user_service.go`（沿用其包结构、依赖注入、错误返回风格）
 > - **依赖**：T-004（Repository 接口）、T-006（Order MySQL 实现）、T-007（Redis 缓存）、T-008（Product/Inventory RPC Client）
 > - **验收标准**：
->   - [ ] 流程步骤与规格书 §4 CreateOrder 伪代码完全一致
+>   - [ ] 流程步骤与规格书 §5 CreateOrder 伪代码完全一致
 >   - [ ] 幂等检查使用 Redis SETNX，key 格式 `idempotent:{user_id}:{idempotency_key}`，TTL 24h
 >   - [ ] 库存扣减成功但订单创建失败时，调用 `inventoryService.Rollback(orderNo)`
 >   - [ ] 订单+outbox 在同一事务内
@@ -159,15 +170,16 @@
 >   - [ ] 单元测试覆盖：正常路径、商品不存在、库存不足、库存回滚、事务失败
 >   - [ ] 测试 mock 库沿用 REPO_PROFILE §5.5 基线（如 gomock）
 > - **预估代码量**：~300 行
-> - **上下文需求**：规格书 §2.Order、§2.OutboxMessage、§3.CreateOrder、§4.CreateOrder、§6 编码约束、REPO_PROFILE §5.5 风格基线
+> - **上下文需求**：规格书 §3.Order、§3.OutboxMessage、§4.CreateOrder、§5.CreateOrder、§9 编码约束、REPO_PROFILE §5.5 风格基线
 
 ## 工作步骤
 
-1. 通读规格书第 1/2/3/4/5 节，识别全部产物。
+1. 通读规格书第 1/3/4/5/7 节（项目结构 / 数据结构 / 接口 / 伪代码 / 依赖图），识别全部产物。§1.4 改动文件清单表是本阶段 Task 产出文件的主依据。
 2. 按"Step 1 → Step 4"拆分。
-3. 检查每个 Task 是否满足"单一职责 / 大小控制 / 边界明确 / 依赖最小 / 可独立测试"五原则。
-4. 生成 `TASKS.md` + `tasks.json`。
-5. 把 Batch 数量、Task 数量、关键路径打印给用户，**用户确认或调整后才能进入 Phase 3**。
+3. 检查每个 Task 是否满足"单一职责 / 大小控制 / 边界明确 / 依赖最小 / 可独立测试"五原则，且未出现 §0 禁止字段。
+4. 生成 `TASKS.md` + `tasks.json`；**用 [@templates/tasks.schema.json](../templates/tasks.schema.json) 对 tasks.json 做校验**，不通过不准进下一步。
+5. 重写 `.spec2code/PROGRESS.md`，Phase 2 → done，Phase 3 → pending（等待 approve）。
+6. **输出统一 STOP & CONFIRM 段**。未收到用户 ✅ approve 之前，禁止调用任何 Phase 3 的工具。
 
 ## Anti-patterns
 
@@ -176,12 +188,15 @@
 - ❌ 验收标准只写"功能正常"。
 - ❌ 依赖列表为空但实际依赖前置 Task。
 - ❌ 把"写测试"作为一个独立 Task —— 测试必须随实现一起做。
+- ❌ 在 Task / `tasks.json` 中出现 §0 中的**禁止字段**。
 
 ## Verification
 
 - [ ] 每个 Task 的预估代码量在 200~500 行（特殊小任务如建表 SQL 可放宽到 50 行）。
 - [ ] 每个 Task 都列了产出文件、依赖、验收标准、上下文需求。
+- [ ] **`tasks.json` 与 `TASKS.md` 中均不出现"禁止字段"**（grep 验证）。
+- [ ] **`tasks.json` 严格通过 [@templates/tasks.schema.json](../templates/tasks.schema.json) 校验**（`additionalProperties:false` + 禁用字段拦截）。
 - [ ] `tasks.json` 与 `TASKS.md` 的 Task ID 集合完全一致。
 - [ ] 依赖关系图无循环。
 - [ ] 同 Batch 内任务彼此无依赖。
-- [ ] 已与用户确认。
+- [ ] 已输出统一 STOP 段且收到 ✅ approve 后才进入 Phase 3。
