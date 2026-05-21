@@ -73,6 +73,40 @@
 
 如果仓库内自相矛盾，记录矛盾并选择"已有的最普遍风格"作为基线。
 
+### Step 5.5 — 风格基线提炼（**Phase 1 必须沿用**）
+
+把 Step 2~5 的结果**汇总为一张"风格基线表"**，明确写入 `REPO_PROFILE.md` 的"风格基线"小节。基线表是 Phase 1 规格书 §6 编码约束的**唯一引用源**，规格书禁止凭空声明风格选型。
+
+基线表至少覆盖：
+
+| 维度 | 仓库现状（基线值） | 证据文件 |
+|---|---|---|
+| 日志库 | {{zap / slog / logrus / 未引入}} | |
+| 日志字段命名 | {{snake_case / camelCase}} | |
+| 日志 trace_id 注入方式 | {{logger.WithContext / 自定义 helper / 未有}} | |
+| HTTP 框架 | {{gin / echo / 标准库 / 未引入}} | |
+| HTTP 响应格式 | {{`{code,message,data}` / `{success,data,error}` / 其他}} | |
+| HTTP 中间件顺序 | {{recover→trace→log→auth→ratelimit→handler / 仓库实际顺序}} | |
+| ORM/SQL 库 | {{gorm v2 / sqlx / ent / 标准库 / 未引入}} | |
+| 事务封装风格 | {{闭包 db.Transaction / 手写 Begin/Commit / 未有}} | |
+| 错误返回风格 | {{`(T, error)` / `*AppError` / 其他}} | |
+| 错误包装风格 | {{`fmt.Errorf("...: %w")` / 自定义 wrap / 未统一}} | |
+| 错误码风格 | {{int 数值 / iota typed / 字符串常量}} | |
+| 测试 mock 库 | {{gomock / testify mock / 未引入}} | |
+| 测试断言库 | {{testify/require+assert / 标准库 / 未引入}} | |
+| 配置加载方式 | {{viper / envconfig / 自研}} | |
+| 包命名 | {{小写单词 / 其他}} | |
+| 文件命名 | {{xxx_repository.go / xxx_repo.go / 其他}} | |
+| 接收器命名 | {{单字母 / 全名}} | |
+| nilaway 是否安装 | ☐ 已安装 ☐ 未安装（**未安装时建议 `go install go.uber.org/nilaway/cmd/nilaway@latest`**） | |
+
+**判定逻辑**：
+
+- 仓库**已有且统一**该维度 → 写入基线值，Phase 1 直接沿用。
+- 仓库**已有但不统一** → 选择最普遍的现状作为基线，并在 Step 6 风险中记录矛盾。
+- 仓库**未引入** → 写"未引入"，Phase 1 规格书必须显式声明选型并说明引入原因。
+- 绿地项目 → 全部"N/A（绿地）"，由 Phase 1 从零设计，并在规格书中说明。
+
 ### Step 6 — 风险与盲点
 
 主动暴露：

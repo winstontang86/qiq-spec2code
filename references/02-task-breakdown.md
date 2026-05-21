@@ -50,18 +50,28 @@
 
 ## 拆分方法
 
-### Step 1 — 按层拆
+### Step 1 — 按层拆（**先对齐仓库现状**）
 
-参照规格书第 5 节的模块依赖图，先按层划分大任务组：
+参照规格书第 5 节的模块依赖图，结合 `REPO_PROFILE.md` 的目录分层结论：
 
-- 基础脚手架组（go.mod、目录、配置加载入口）
+- **仓库已有 DDD 分层** → 直接套用 `domain → repository → infrastructure → application → interfaces` 五层顺序。
+- **仓库已有 Clean Arch** → 套用 `entity → usecase → adapter → infrastructure` 顺序。
+- **仓库已有 MVC** → 套用 `model → dao → service → controller` 顺序。
+- **仓库已有 Flat / Mixed** → 不强行套层级，按规格书 §5 的依赖图拆分；产出文件路径必须**落到仓库已有的同类目录**，不要新建一套。
+- **绿地项目** → 按规格书 §1 设计的目录从 0 拆分。
+
+> 关键原则：**Task 的产出文件路径必须先在 `REPO_PROFILE.md` 的目录表中能找到归属**；找不到归属的文件必须显式标注"新增目录"并在该 Task 的描述中说明原因。
+
+可能的大任务组（按现状选用）：
+
+- 基础脚手架组（go.mod、目录、配置加载入口；绿地项目才需要）
 - 领域层组（实体、值对象、状态机、仓储接口）
 - 基础设施组（DB 实现、缓存、RPC client、MQ producer/consumer）
 - 应用层组（编排业务流程的服务）
 - 接入层组（HTTP handler、MQ consumer、定时任务入口）
-- 横切关注点组（中间件、日志、监控、配置）
+- 横切关注点组（中间件、日志、监控、配置；**已存在则不拆为独立 Task**）
 
-### Step 2 — 层内按模块拆
+### Step 2 — 层内按模块拆（**优先复用已有模块作为参考**）
 
 每层内按"功能模块/实体"进一步拆分。例如基础设施组拆为：
 
@@ -69,6 +79,8 @@
 - OutboxRepository MySQL 实现
 - OrderCache Redis 封装
 - ProductService RPC Client
+
+**强约束**：每个 Task 描述中必须显式标注"参考仓库哪个已有模块的风格"（如"参考 `internal/user/repository/user_repository_mysql.go` 的目录结构与命名"）。这样 Implementer 在实现时就有具体可对照的模板，而不是基于 AI 自身偏好。
 
 ### Step 3 — 模块内按功能拆
 
@@ -136,16 +148,18 @@
 > - **产出文件**：
 >   - `internal/application/order_service.go`（CreateOrder 方法）
 >   - `internal/application/order_service_test.go`
+> - **参考仓库已有模块**：`internal/user/application/user_service.go`（沿用其包结构、依赖注入、错误返回风格）
 > - **依赖**：T-004（Repository 接口）、T-006（Order MySQL 实现）、T-007（Redis 缓存）、T-008（Product/Inventory RPC Client）
 > - **验收标准**：
 >   - [ ] 流程步骤与规格书 §4 CreateOrder 伪代码完全一致
 >   - [ ] 幂等检查使用 Redis SETNX，key 格式 `idempotent:{user_id}:{idempotency_key}`，TTL 24h
 >   - [ ] 库存扣减成功但订单创建失败时，调用 `inventoryService.Rollback(orderNo)`
 >   - [ ] 订单+outbox 在同一事务内
+>   - [ ] **`nilaway` 对本次新增/修改文件无报告**
 >   - [ ] 单元测试覆盖：正常路径、商品不存在、库存不足、库存回滚、事务失败
->   - [ ] 测试使用 gomock 替代外部依赖
+>   - [ ] 测试 mock 库沿用 REPO_PROFILE §5.5 基线（如 gomock）
 > - **预估代码量**：~300 行
-> - **上下文需求**：规格书 §2.Order、§2.OutboxMessage、§3.CreateOrder、§4.CreateOrder、§6 编码约束
+> - **上下文需求**：规格书 §2.Order、§2.OutboxMessage、§3.CreateOrder、§4.CreateOrder、§6 编码约束、REPO_PROFILE §5.5 风格基线
 
 ## 工作步骤
 

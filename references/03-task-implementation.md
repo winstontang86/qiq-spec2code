@@ -147,7 +147,7 @@ func (r *OrderRepo) Update(ctx context.Context, order *entity.Order) error {
 如果 Verifier 把 Task 打回（`VERIFY_REPORT.md` 中存在 Block / Major 问题），Coordinator 会把校验报告作为追加上下文给你。此时：
 
 1. 先在 `IMPL_REPORT.md` 顶部记录 `Attempt N` 标题。
-2. 逐条响应 Verifier 的问题：要么修复，要么显式说明"无法修复 + 原因"。
+2. 逐条响应 Verifier 的问题：要么修复，要么显式说明"无法修复 + 原因"。无法修复的必须人工检查确认。
 3. 仅修改与问题相关的代码，**不要顺手改其他无关代码**。
 4. 重做一次自检。
 

@@ -79,6 +79,31 @@
 - 不一致点：{{...}}
 - 选择的基线风格：{{...}}（最普遍的）
 
+## 5.5 风格基线（Phase 1 唯一引用源）
+
+> **本表是 Phase 1 规格书 §6 编码约束的唯一引用源**。Phase 1 不得凭空声明风格选型；本表中"未引入"的项必须由规格书显式声明并说明引入原因。
+
+| 维度 | 仓库现状（基线值） | 证据文件 |
+|---|---|---|
+| 日志库 | {{zap / slog / logrus / 未引入}} | {{...}} |
+| 日志字段命名 | {{snake_case / camelCase / 未统一}} | {{...}} |
+| 日志 trace_id 注入方式 | {{logger.WithContext / 自定义 helper / 未有}} | {{...}} |
+| HTTP 框架 | {{gin / echo / 标准库 / 未引入}} | {{...}} |
+| HTTP 响应格式 | {{`{code,message,data}` / 其他}} | {{...}} |
+| HTTP 中间件顺序 | {{...}} | {{...}} |
+| ORM/SQL 库 | {{gorm v2 / sqlx / ent / 未引入}} | {{...}} |
+| 事务封装风格 | {{闭包 / 手写 Begin/Commit / 未有}} | {{...}} |
+| 错误返回风格 | {{`(T, error)` / `*AppError`}} | {{...}} |
+| 错误包装风格 | {{`fmt.Errorf("%w")` / 自定义 wrap}} | {{...}} |
+| 错误码风格 | {{int / iota typed / 字符串常量}} | {{...}} |
+| 测试 mock 库 | {{gomock / testify mock / 未引入}} | {{...}} |
+| 测试断言库 | {{testify / 标准库 / 未引入}} | {{...}} |
+| 配置加载方式 | {{viper / envconfig / 自研}} | {{...}} |
+| 包命名 | {{小写单词 / 其他}} | {{...}} |
+| 文件命名 | {{xxx_repository.go / xxx_repo.go}} | {{...}} |
+| 接收器命名 | {{单字母 / 全名}} | {{...}} |
+| nilaway 是否安装 | ☐ 已安装 ☐ 未安装（建议 `go install go.uber.org/nilaway/cmd/nilaway@latest`） | {{...}} |
+
 ## 6. 风险与盲点
 
 - ☐ 无 `go.mod`

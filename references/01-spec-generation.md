@@ -81,17 +81,28 @@ Layer 4: interfaces/http, interfaces/consumer
 
 ### 6. 编码约束清单
 
-把 [@references/06-coding-constraints-common.md](06-coding-constraints-common.md) 与 [@references/07-coding-constraints-go.md](07-coding-constraints-go.md) 中的条款**按本方案实际涉及的范围**摘取并落地，至少覆盖：
+把 [@references/06-coding-constraints-common.md](06-coding-constraints-common.md) 与 [@references/07-coding-constraints-go.md](07-coding-constraints-go.md) 中的核心约束按本方案实际涉及的范围摘取并落地，至少覆盖：
 
-- 类型与单位（金额单位、时间精度、ID 类型）
-- 超时与重试（数据库、RPC、HTTP、缓存）
-- 幂等与并发（幂等键、乐观锁字段、分布式锁使用边界）
-- 错误处理（包装、错误链、自定义错误类型）
-- 日志（结构化、trace_id、敏感字段脱敏）
-- 配置（不允许硬编码的项清单）
-- 安全（鉴权、SQL 注入防护、参数校验）
+- 类型与单位（金额单位、时间精度、ID 类型、枚举）
+- 超时与外部调用（数据库、RPC、HTTP、context 传递）
+- 幂等与并发（幂等键、乐观锁字段、循环内 N+1）
+- 错误处理（错误链、自定义错误类型、不吞错）
+- nil 安全（**必须沿用 G4 全部条款，nilaway 检查为强制门禁**）
 
-每条约束必须可机械验证（"做或没做"），禁止"尽量"、"建议"、"应当考虑"等暧昧措辞。
+**风格类约束（日志、HTTP、ORM、测试库、错误返回风格、命名）必须沿用 `REPO_PROFILE.md` §5.5 风格基线，禁止在规格书中凭空指定**。引用方式如下：
+
+```
+- 日志：沿用 REPO_PROFILE §5.5「日志库 = {{zap}}」「日志字段命名 = {{snake_case}}」「trace_id 注入方式 = {{...}}」
+- HTTP 框架：沿用 REPO_PROFILE §5.5「HTTP 框架 = {{gin}}」「响应格式 = {{...}}」「中间件顺序 = {{...}}」
+- ORM：沿用 REPO_PROFILE §5.5「ORM/SQL 库 = {{gorm v2}}」「事务封装 = {{闭包}}」
+- 测试 mock/断言：沿用 REPO_PROFILE §5.5「mock 库 = {{gomock}}」「断言库 = {{testify}}」
+- 错误返回风格：沿用 REPO_PROFILE §5.5「错误返回 = (T, error)」「包装风格 = `%w`」
+- 命名：沿用 REPO_PROFILE §5.5「包名」「文件命名」「接收器」
+```
+
+`REPO_PROFILE` 中标注"未引入"的维度，规格书必须显式声明选型并写明引入原因；与基线偏离的决策也必须在 §1.3 显式列出。
+
+每条核心约束必须可机械验证（"做或没做"），禁止"尽量"、"建议"、"应当考虑"等暧昧措辞。
 
 ## 工作步骤
 
@@ -117,6 +128,8 @@ Layer 4: interfaces/http, interfaces/consumer
 - [ ] 每个接口都有完整错误码表。
 - [ ] 每个流程的异常分支都有显式处理。
 - [ ] 模块依赖图按 Layer 排序，无循环依赖。
-- [ ] 编码约束清单条款数量 ≥ 10 条，且每条可机械验证。
-- [ ] 与 `REPO_PROFILE.md` 的所有偏离均已显式说明。
+- [ ] §6 编码约束**全部沿用 `REPO_PROFILE.md` §5.5 风格基线**；任何"未引入"或偏离均已显式声明引入原因。
+- [ ] §6 nil 安全（G4）已完整列入，并明确 Phase 5 强制 `nilaway ./...`。
+- [ ] §6 核心约束条款数 ≥ 8，且每条可机械验证。
+- [ ] 与 `REPO_PROFILE.md` 的所有偏离已在 §1.3 显式说明。
 - [ ] 已与用户确认。

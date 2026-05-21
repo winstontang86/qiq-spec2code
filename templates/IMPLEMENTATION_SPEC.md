@@ -250,56 +250,75 @@ interfaces/http
 
 ## 6. 编码约束清单
 
-> 摘自 [@references/06-coding-constraints-common.md](../references/06-coding-constraints-common.md) 与 [@references/07-coding-constraints-go.md](../references/07-coding-constraints-go.md)，按本方案实际涉及范围摘取。
+> **核心约束**摘自 [@references/06-coding-constraints-common.md](../references/06-coding-constraints-common.md) 与 [@references/07-coding-constraints-go.md](../references/07-coding-constraints-go.md)；**风格类约束**沿用 `.spec2code/REPO_PROFILE.md` §5.5 风格基线，不在此重复定义。
 
-### 6.1 类型与单位
+### 6.1 类型与单位（核心）
 
 - [ ] 金额字段使用 `int64`，单位"分"。
 - [ ] 时间使用 `time.Time`（UTC），DB 列 `DATETIME(3)`。
 - [ ] ID 使用 `int64`。
 - [ ] 枚举使用 `type Foo int8` + 显式常量。
 
-### 6.2 超时与重试
+### 6.2 超时与外部调用（核心）
 
-- [ ] DB 操作超时 3 秒。
-- [ ] RPC 调用超时 1 秒。
-- [ ] RPC 重试最多 2 次，退避 100ms / 200ms。
-- [ ] 仅幂等下游允许重试。
+- [ ] DB 操作超时 {{3}} 秒。
+- [ ] RPC/HTTP 调用超时 {{1}} 秒。
+- [ ] 仅幂等下游允许重试；本方案需重试的下游：{{...}}。
+- [ ] 所有 I/O 传 `context.Context`，生产路径无 `context.Background()` / `context.TODO()`。
 
-### 6.3 幂等与并发
+### 6.3 幂等与并发（核心）
 
-- [ ] 写操作必须幂等。
-- [ ] 乐观锁使用 version 字段；更新时 `WHERE version=? SET version=version+1` 并校验 RowsAffected。
-- [ ] 禁止 for 循环内单条 DB/RPC 调用。
+- [ ] 写操作幂等。
+- [ ] 乐观锁使用 version 字段，更新时校验 `RowsAffected`。
+- [ ] for 循环内禁止单条 DB/RPC 调用（必要的批量接口已在 §3 接口契约中声明）。
 
-### 6.4 错误处理
+### 6.4 错误处理（核心）
 
 - [ ] 错误使用 `fmt.Errorf("...: %w", err)` 包装。
 - [ ] 不吞错；忽略必须注释说明。
-- [ ] 业务错误使用 sentinel 或 typed error。
+- [ ] 业务错误使用 sentinel 或 typed error，与 §3 错误码表一一对应。
 
-### 6.5 日志
+### 6.5 nil 安全（**强制**，沿用 G4 全部条款）
 
-- [ ] 结构化（zap）。
-- [ ] 含 trace_id。
-- [ ] 敏感字段脱敏。
+- [ ] **`nilaway ./...` 必须零报告**（Phase 5 集成校验执行）。
+- [ ] 返回指针/接口/map 的函数，调用方必须先判 nil 再解引用。
+- [ ] map 写入前必须确保已初始化。
+- [ ] 类型断言必须使用 `v, ok := x.(T)` 形式。
+- [ ] JSON / RPC 反序列化的指针字段使用前必须判 nil。
 
-### 6.6 配置
+### 6.6 风格沿用（引用 `REPO_PROFILE.md` §5.5）
 
-- [ ] 所有可变值从配置文件/环境变量读取。
-- [ ] 启动期校验配置完整性。
+> **禁止在本节凭空声明风格选型**；所有项必须从 `REPO_PROFILE.md` §5.5 风格基线表中复制基线值。`REPO_PROFILE` 中标注"未引入"的项必须在此显式声明并写明引入原因。
 
-### 6.7 安全
+| 维度 | 沿用基线值 | 说明（仅 REPO_PROFILE 为"未引入"时填写） |
+|---|---|---|
+| 日志库 | {{REPO_PROFILE.5.5 → ...}} | |
+| 日志字段命名 | {{...}} | |
+| trace_id 注入方式 | {{...}} | |
+| HTTP 框架 | {{...}} | |
+| HTTP 响应格式 | {{...}} | |
+| 中间件顺序 | {{...}} | |
+| ORM/SQL 库 | {{...}} | |
+| 事务封装 | {{...}} | |
+| 错误返回风格 | {{...}} | |
+| 错误码风格 | {{...}} | |
+| 测试 mock 库 | {{...}} | |
+| 测试断言库 | {{...}} | |
+| 配置加载 | {{...}} | |
+| 包/文件/接收器命名 | {{...}} | |
+
+### 6.7 安全（核心）
 
 - [ ] 所有外部输入参数校验。
 - [ ] SQL 参数化。
 - [ ] 错误消息对外脱敏。
+- [ ] 敏感字段日志中脱敏。
 
-### 6.8 测试
+### 6.8 测试（核心）
 
 - [ ] 每个产出有单元测试。
 - [ ] 覆盖正常 + 异常 + 边界。
-- [ ] mock 在接口层。
+- [ ] mock 在接口层（具体 mock 库沿用 §6.6）。
 
 ### 6.9 依赖版本约束
 
