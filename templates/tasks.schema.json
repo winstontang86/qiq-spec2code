@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "qiq-spec2code tasks state",
+  "description": "Phase 2 产出的 tasks.json 的结构定义；Phase 3/4 在此基础上更新 status / attempt / last_error。",
+  "type": "object",
+  "required": ["spec_path", "generated_at", "tasks"],
+  "properties": {
+    "spec_path": {
+      "type": "string",
+      "description": "对应的实现规格书路径，例如 .spec2code/IMPLEMENTATION_SPEC.md"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "language": {
+      "type": "string",
+      "enum": ["go", "python", "typescript", "java", "rust", "other"],
+      "default": "go"
+    },
+    "tasks": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Task" }
+    }
+  },
+  "definitions": {
+    "Task": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "batch",
+        "depends_on",
+        "outputs",
+        "spec_refs",
+        "estimated_loc",
+        "status",
+        "attempt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^T-\\d{3,}$",
+          "description": "任务 ID，T-001 起，零填充至少 3 位"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "batch": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "所属批次；同 batch 内任务彼此无依赖，可并行"
+        },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^T-\\d{3,}$" },
+          "description": "前置任务 ID 列表，可为空"
+        },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "本任务产出的文件路径（相对仓库根目录）"
+        },
+        "spec_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "本任务依赖的规格书章节引用，如 §2.Order、§4.CreateOrder"
+        },
+        "estimated_loc": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "预估代码量（含测试）；常规范围 200~500，特殊小任务可放宽到 ≥ 1"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "passed", "failed", "waived"],
+          "description": "任务状态。waived = 显式豁免（含豁免理由）"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "实现-校验循环已尝试次数；≥3 触发停止流水线"
+        },
+        "last_error": {
+          "type": ["string", "null"],
+          "description": "最近一次失败的概要错误信息；通过则为 null"
+        },
+        "waiver_reason": {
+          "type": ["string", "null"],
+          "description": "若 status=waived，必须填写豁免理由"
+        },
+        "context_path": {
+          "type": "string",
+          "description": ".spec2code/tasks/<id>/context.md"
+        },
+        "impl_report_path": {
+          "type": "string",
+          "description": ".spec2code/tasks/<id>/impl_report.md"
+        },
+        "verify_report_path": {
+          "type": "string",
+          "description": ".spec2code/tasks/<id>/verify_report.md"
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "waived" } } },
+          "then": { "required": ["waiver_reason"] }
+        }
+      ]
+    }
+  }
+}
