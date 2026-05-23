@@ -127,7 +127,7 @@ Layer 4: interfaces/http, interfaces/consumer
 - 超时与外部调用（数据库、RPC、HTTP、context 传递）
 - 幂等与并发（幂等键、乐观锁字段、循环内 N+1）
 - 错误处理（错误链、自定义错误类型、不吞错）
-- nil 安全（**必须沿用 G4 全部条款，nilaway 检查为强制门禁**）
+- nil 安全（**必须沿用 G4 全部条款；nilaway 仅对增量代码强制，存量遗留登记不处理**）
 
 **风格类约束（日志、HTTP、ORM、测试库、错误返回风格、命名）必须沿用 `REPO_PROFILE.md` §5.5 风格基线，禁止在规格书中凭空指定**。引用方式如下：
 
@@ -157,7 +157,7 @@ Layer 4: interfaces/http, interfaces/consumer
    - [ ] 方案中"故障与异常路径汇总"表的每一行都在规格书 §6 边界表出现
    - [ ] 方案中的每个 SLO / 容量参数都有落地方式（§8 配置参数表）
 6. 随机抽 3 个字段、2 个错误码、1 个流程，模拟"交给新人是否能 100% 还原"。如不能，继续打磨。
-7. **输出统一 STOP & CONFIRM 段**（指向 `IMPLEMENTATION_SPEC.md` + `SPEC_COVERAGE.md` 两个产物），等待用户 ✅ approve。收到 ✅ 之前，禁止调用任何 Phase 2 的工具。
+7. 按 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) 执行 Phase 1 Gate 四步法（产物：`IMPLEMENTATION_SPEC.md` + `SPEC_COVERAGE.md`）。
 
 ## Anti-patterns
 
@@ -181,8 +181,8 @@ Layer 4: interfaces/http, interfaces/consumer
 - [ ] 每个流程的异常分支都有显式处理。
 - [ ] 模块依赖图按 Layer 排序，无循环依赖。
 - [ ] §9 编码约束**全部沿用 `REPO_PROFILE.md` §5.5 风格基线**；任何"未引入"或偏离均已显式声明引入原因。
-- [ ] §9 nil 安全（G4）已完整列入，并明确 Phase 5 强制 `nilaway ./...`。
+- [ ] §9 nil 安全（G4）已完整列入，并明确 Phase 5 对**增量代码**强制 `nilaway`（存量遗留登记不处理）。
 - [ ] §9 核心约束条款数 ≥ 8，且每条可机械验证。
 - [ ] 与 `REPO_PROFILE.md` 的所有偏离已在 §1.3 显式说明。
 - [ ] **`SPEC_COVERAGE.md` 已产出且未覆盖数 = 0**（或所有未覆盖已显式豁免）。
-- [ ] 已输出统一 STOP & CONFIRM 段，且**未收到 ✅ approve 之前未调用任何 Phase 2 工具**。
+- [ ] 已按 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) 执行 Gate，且**未收到 ✅ approve 之前未调用任何 Phase 2 工具**。

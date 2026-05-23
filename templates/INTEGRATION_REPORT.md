@@ -47,6 +47,28 @@ $ {{golangci-lint run / make lint}}
 
 > 任一失败 → **整体 FAIL**。
 
+### 1.5 nilaway 增量门禁（**对增量代码强制；存量遗留登记不处理**）
+
+> 范围与执行步骤详见 [@references/05-integration-check.md](../references/05-integration-check.md) §1.5。
+
+- **BASELINE_COMMIT**：`{{REPO_PROFILE.md §5.5 中记录的值，如 a1b2c3d4 / GREENFIELD / NO_GIT}}`
+- **INCR_FILES 来源**：☐ tasks.json 产出文件并集 ☐ git diff 兜底 ☐ 全仓（绿地）
+- **INCR_FILES 数量**：{{N}}
+
+执行结果：
+
+```
+$ nilaway ./... > .spec2code/state/nilaway.raw.txt
+原始报告条数：{{X}}
+增量命中（nilaway.incr.txt）：{{Y}} 行  ← **必须为 0**
+存量遗留（nilaway.legacy.txt）：{{Z}} 行  ← 不阻塞，仅登记
+```
+
+- [ ] **`nilaway.incr.txt` 行数 = 0**（任一行 → FAIL）
+- 存量遗留涉及文件清单（仅文件名，不展开行号）：{{...}}
+- 存量遗留登记说明：存量代码命中，**不在本次方案治理范围**，建议由仓库 Owner 排期独立任务治理。
+- 若用户在 Phase 0 选择不安装 nilaway → 替换为人工降级登记：降级原因 / Owner / 整改时间 = {{...}}
+
 ---
 
 ## 2. 接口衔接抽样

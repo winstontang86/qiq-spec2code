@@ -103,6 +103,7 @@
 | 文件命名 | {{xxx_repository.go / xxx_repo.go}} | {{...}} |
 | 接收器命名 | {{单字母 / 全名}} | {{...}} |
 | nilaway 是否安装 | ☐ 已安装 ☐ 未安装（建议 `go install go.uber.org/nilaway/cmd/nilaway@latest`） | {{...}} |
+| **基线 commit（BASELINE_COMMIT）** | {{git rev-parse HEAD 输出，如 `a1b2c3d4`；用于 Phase 5 增量代码差分；绿地项目填 `GREENFIELD`，无 `.git/` 填 `NO_GIT`}} | {{Phase 5 nilaway/INCR_FILES 兜底基线}} |
 
 ## 6. 风险与盲点
 

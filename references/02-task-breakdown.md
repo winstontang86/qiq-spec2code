@@ -166,7 +166,7 @@ effort / estimateHours / manDays / workload / days / manday / storyPoint / story
 >   - [ ] 幂等检查使用 Redis SETNX，key 格式 `idempotent:{user_id}:{idempotency_key}`，TTL 24h
 >   - [ ] 库存扣减成功但订单创建失败时，调用 `inventoryService.Rollback(orderNo)`
 >   - [ ] 订单+outbox 在同一事务内
->   - [ ] **`nilaway` 对本次新增/修改文件无报告**
+>   - [ ] **`nilaway` 对本任务新增/修改文件无报告**（增量语义；存量文件不在本任务治理范围）
 >   - [ ] 单元测试覆盖：正常路径、商品不存在、库存不足、库存回滚、事务失败
 >   - [ ] 测试 mock 库沿用 REPO_PROFILE §5.5 基线（如 gomock）
 > - **预估代码量**：~300 行
@@ -178,8 +178,7 @@ effort / estimateHours / manDays / workload / days / manday / storyPoint / story
 2. 按"Step 1 → Step 4"拆分。
 3. 检查每个 Task 是否满足"单一职责 / 大小控制 / 边界明确 / 依赖最小 / 可独立测试"五原则，且未出现 §0 禁止字段。
 4. 生成 `TASKS.md` + `tasks.json`；**用 [@templates/tasks.schema.json](../templates/tasks.schema.json) 对 tasks.json 做校验**，不通过不准进下一步。
-5. 重写 `.spec2code/PROGRESS.md`，Phase 2 → done，Phase 3 → pending（等待 approve）。
-6. **输出统一 STOP & CONFIRM 段**。未收到用户 ✅ approve 之前，禁止调用任何 Phase 3 的工具。
+5. 按 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) 执行 Phase 2 Gate 四步法（产物：`TASKS.md` + `state/tasks.json`）。
 
 ## Anti-patterns
 
@@ -199,4 +198,4 @@ effort / estimateHours / manDays / workload / days / manday / storyPoint / story
 - [ ] `tasks.json` 与 `TASKS.md` 的 Task ID 集合完全一致。
 - [ ] 依赖关系图无循环。
 - [ ] 同 Batch 内任务彼此无依赖。
-- [ ] 已输出统一 STOP 段且收到 ✅ approve 后才进入 Phase 3。
+- [ ] 已按 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) 执行 Gate 并收到 ✅ approve 后才进入 Phase 3。

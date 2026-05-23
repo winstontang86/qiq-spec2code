@@ -8,7 +8,7 @@
 
 ## 输入
 
-- 仓库根目录路径
+- **工作仓库根目录路径**（= 调用 skill 时 shell 的 `pwd`，也是后续 `.spec2code/` 写入的锚点；本阶段所有扫描都限定在该目录内，禁止越界扫描父目录或其它仓库）
 - （可选）用户提供的关键模块/目录线索
 
 ## 工作步骤
@@ -17,9 +17,10 @@
 
 执行（或等价操作）：
 
-- 列出根目录文件与一级子目录
+- 列出工作仓库根目录的文件与一级子目录
 - 识别构建工件：`go.mod` / `go.sum` / `Makefile` / `Dockerfile`
 - 识别版本控制状态：`.git/` 是否存在；最近一次 commit 时间（如能取到）
+- **记录基线 commit**：执行 `git rev-parse HEAD`，把输出写入 `REPO_PROFILE.md` §5.5 的 `BASELINE_COMMIT` 字段。这是 Phase 5 nilaway 增量门禁差分 `INCR_FILES` 的兜底基线（绿地项目写 `GREENFIELD`，无 `.git/` 写 `NO_GIT`）。
 
 **绿地项目识别**：若仓库有效内容仅有 `LICENSE` / `README.md` / `.gitignore` 等元文件，标注为 **Greenfield**，后续 Phase 1 需从零设计目录结构；其他场景标注为 **Brownfield**。
 
@@ -119,12 +120,11 @@
 
 把结果填入 [@templates/REPO_PROFILE.md](../templates/REPO_PROFILE.md) 的所有章节，写入 `.spec2code/REPO_PROFILE.md`。
 
-### Phase 0 完成动作（必须全部执行）
+### Phase 0 完成动作
 
-1. 写入 `.spec2code/REPO_PROFILE.md`。
-2. 重写 `.spec2code/PROGRESS.md`（按 [@templates/PROGRESS.md](../templates/PROGRESS.md) 模板），把 Phase 0 状态置为 `done`，下一阶段 Phase 1 状态置为 `pending（等待 approve）`。
-3. 把画像核心摘要（语言版本、分层风格、关键依赖选型、绿地/棕地、关键风险）打印给用户。
-4. **输出统一 STOP & CONFIRM 段**，等待用户 `✅ approve`。**收到 ✅ 之前，禁止调用任何 Phase 1 的工具**。
+按 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) 执行 Gate 四步法。
+
+第 3 步"打印摘要"对本 Phase 的具体要求：核心摘要至少包含**语言版本、分层风格、关键依赖选型、绿地/棕地、§5.5 风格基线表、nilaway 状态、BASELINE_COMMIT、关键风险**。
 
 ## Rules
 

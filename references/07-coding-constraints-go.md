@@ -27,13 +27,16 @@
 - **G3.4** 禁止 `_ = someFunc()` 吞错；如确需忽略，必须有注释说明原因。
 - **G3.5** `panic` 仅用于不可恢复的程序错误（如配置启动校验失败）；HTTP/RPC handler 必须有 recover 中间件（具体中间件实现沿用仓库现状）。
 
-## G4. nil 安全（**强制：必须通过 nilaway 检查**）
+## G4. nil 安全（**强制：增量代码必须通过 nilaway 检查**）
 
 > Go 中绝大多数线上 panic 来自"以为非 nil 的指针/接口/map/slice 实际为 nil"。本组为硬约束。
+>
+> **范围**：nilaway 门禁仅覆盖本次方案的**增量代码**（`INCR_FILES`，定义见 [@references/05-integration-check.md](05-integration-check.md) §1.5）。**存量代码命中报告不在本次治理范围内**，仅登记不修复。
 
-- **G4.1** **`nilaway ./...` 必须零报告**：Phase 5 集成校验会强制运行该命令，任一报告即 FAIL。
+- **G4.1** **增量代码 `nilaway` 报告必须为空**：Phase 5 集成校验会执行 `nilaway ./...` 全仓扫描后按 `INCR_FILES` 做差分，**`nilaway.incr.txt` 任一行即 FAIL**。存量遗留落入 `nilaway.legacy.txt`，仅登记不阻塞。
   - 仓库未安装 nilaway 时，Phase 0 扫描阶段须提示用户安装：`go install go.uber.org/nilaway/cmd/nilaway@latest`。
-  - 用户拒绝安装时，必须人工逐文件审查指针解引用，并在 `INTEGRATION_REPORT.md` 显式登记降级。
+  - 用户拒绝安装时，必须**对增量代码**人工逐文件审查指针解引用，并在 `INTEGRATION_REPORT.md` 显式登记降级。
+  - **严禁**为了让增量报告为空而擅自修改存量代码（属于规格书外发挥，参见红线）。
 - **G4.2** **返回指针/接口的函数**：调用方必须先判 nil 再解引用，禁止"反正不会为 nil"的假设。
 - **G4.3** **可能为 nil 的字段**：结构体中表示"可选"的字段使用指针 + 显式判 nil；不要用零值含糊代表"无"。
 - **G4.4** **map 写入前必须确保已初始化**：`m == nil` 时写入 panic；接收外部传入的 map 前先判空，未初始化则 `m = make(...)`。

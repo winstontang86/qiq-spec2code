@@ -27,15 +27,41 @@ go vet ./...
 
 任一失败 → `FAIL`，必须先修。
 
-### 1.5 nil 安全检查（**强制门禁**）
+### 1.5 nil 安全检查（**对增量代码强制门禁；存量代码不发散**）
+
+> **范围约定**：本 skill 的 nilaway 门禁只覆盖**本次方案产生的增量代码**（以下简称 `INCR_FILES`）。存量代码即便命中 nilaway 也不阻塞流水线，仅做一次性登记，由仓库 Owner 另行排期治理——避免一次落地任务被存量遗留带偏。
+>
+> **`INCR_FILES` 的取法**（按可用性优先级）：
+> 1. 优先用 `tasks.json` 中所有 Task 的 `产出文件清单` 并集；
+> 2. 兜底用 `git diff --name-only <baseline>..HEAD -- '*.go'`，其中 `<baseline>` = Phase 0 扫描时记录的初始 commit（写入 `REPO_PROFILE.md`）；
+> 3. 绿地项目 `INCR_FILES` 等于全仓 `.go` 文件。
+
+执行步骤：
 
 ```bash
 # 若仓库未安装：go install go.uber.org/nilaway/cmd/nilaway@latest
-nilaway ./...
+# 1) 全仓扫描，落盘原始报告
+nilaway ./... > .spec2code/state/nilaway.raw.txt 2>&1 || true
+
+# 2) 计算 INCR_FILES（示例：用 tasks.json 的产出文件并集；下面用 git diff 兜底）
+git diff --name-only "$BASELINE_COMMIT"..HEAD -- '*.go' > .spec2code/state/incr_files.txt
+
+# 3) 把原始报告按文件路径切分为「增量命中」与「存量遗留」
+grep -F -f .spec2code/state/incr_files.txt .spec2code/state/nilaway.raw.txt \
+  > .spec2code/state/nilaway.incr.txt || true
+grep -v -F -f .spec2code/state/incr_files.txt .spec2code/state/nilaway.raw.txt \
+  > .spec2code/state/nilaway.legacy.txt || true
 ```
 
-- [ ] 零报告。任一报告 → `FAIL`，必须先修。
-- [ ] 用户在 Phase 0 已显式选择"不安装 nilaway 走人工降级"时，本步骤替换为：**逐文件人工审查指针解引用、类型断言、map 写入、JSON 反序列化**，并在报告中登记降级原因 + Owner + 整改时间。
+判定规则：
+
+- [ ] **`nilaway.incr.txt` 必须为空**（增量代码零报告）。任一行 → `FAIL`，必须先修。
+- [ ] `nilaway.legacy.txt` 非空时**不阻塞**，但必须在 `INTEGRATION_REPORT.md` 中：
+  - 登记报告条数；
+  - 列出涉及的存量文件清单（仅文件名，不展开行号）；
+  - 标注 "存量遗留，不在本次方案治理范围内"。
+- [ ] 用户在 Phase 0 已显式选择"不安装 nilaway 走人工降级"时，本步骤替换为：**只对 `INCR_FILES` 逐文件人工审查指针解引用、类型断言、map 写入、JSON 反序列化**，并在报告中登记降级原因 + Owner + 整改时间。
+- [ ] **禁止**为了让 `nilaway.incr.txt` 为空而修改存量代码——存量代码改动须走独立任务和评审，不在本次方案落地范围内。
 
 ### 2. 测试执行
 
@@ -96,16 +122,7 @@ go test ./...
 
 ### 10. 反作弊与状态一致性（**强制门禁**）
 
-> 防止"假装完成"或"状态多源漂移"。任一不通过即 `FAIL`。
-
-- [ ] grep 全仓 `// SPEC_QUESTION:` 必须为 0 条**未解决**项（已解决项可在 IMPL_REPORT 偏差章节登记后保留）。
-- [ ] `tasks.json` 中**不存在** `attempt >= 3 且 status != passed/waived` 的 Task。
-- [ ] `.spec2code/PROGRESS.md` 与 `.spec2code/state/tasks.json` 状态**完全一致**：
-  - 各 Phase 状态一致；
-  - 每个 Task 在 PROGRESS §2 表格中的 `状态 / Attempt` 字段与 tasks.json 完全相同；
-  - 任一不一致 → `FAIL`，必须先回填 PROGRESS.md。
-- [ ] `.spec2code/SPEC_COVERAGE.md` 中"未覆盖"数 = 0（或所有未覆盖均已显式登记豁免，含 Owner + 后续整改时间）。
-- [ ] `TASKS.md` / `tasks.json` 内**无禁止字段**（`工作量 / 工时 / 估时 / 天数 / 人天 / story point / effort / estimateHours / manDays`）。
+> 防止"假装完成"或"状态多源漂移"。本节核对项的具体清单见 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) §反作弊核对，**任一不通过即 `FAIL`**。本阶段必须执行该清单全部条目。
 
 ## Output
 
@@ -136,7 +153,7 @@ go test ./...
 
 - [ ] `go build ./...` 已运行并通过。
 - [ ] `go vet ./...` 已运行并通过。
-- [ ] **`nilaway ./...` 已运行且零报告**（或登记人工降级原因）。
+- [ ] **`nilaway` 增量报告为空**（`nilaway.incr.txt` 零行；存量遗留已在报告中登记，不阻塞）。或登记人工降级原因。
 - [ ] `go test ./...` 已运行并记录结果。
 - [ ] 至少 2 条核心链路做过端到端衔接核对。
 - [ ] 已对原始方案功能列表逐条回扫。
@@ -144,8 +161,7 @@ go test ./...
 - [ ] 配置完整性已核对。
 - [ ] trace/context 全链路已抽样。
 - [ ] 风格基线一致性已对照 `REPO_PROFILE.md` §5.5 核对。
-- [ ] **§10 反作弊与状态一致性全部通过**：SPEC_QUESTION=0 / attempt≥3 未遗留 / PROGRESS.md · tasks.json 一致 / SPEC_COVERAGE 未覆盖=0 / TASKS · tasks.json 无禁用字段。
+- [ ] **§10 反作弊与状态一致性全部通过**（详见 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) §反作弊核对）。
 - [ ] 总体结论已严格按规则给出（PASS / PASS_WITH_WAIVER / FAIL）。
 - [ ] 报告已写入 `.spec2code/INTEGRATION_REPORT.md`。
-- [ ] 已重写 `.spec2code/PROGRESS.md` 且与 tasks.json 状态一致。
-- [ ] 已输出统一 STOP & CONFIRM 段，等待用户最终确认是否上线。
+- [ ] 已按 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) 执行 Phase 5 Gate（含反作弊核对），等待用户最终确认是否上线。
