@@ -138,13 +138,16 @@ version: 0.3.0
 
 > **角色严格分离**：Implementer 只能看 `TASK_CONTEXT.md`，**不读原始方案**；Verifier 只以规格书为标准，不做风格审查。两者使用不同会话/视角，避免"自审自查"。
 
-### Phase 5 — 集成校验
+### Phase 5 — 集成校验（**本地范围**）
 
 所有 Task 状态变为 `passed` 后执行，按 [@references/05-integration-check.md](references/05-integration-check.md) 执行，产出 `.spec2code/INTEGRATION_REPORT.md`（基于 [@templates/INTEGRATION_REPORT.md](templates/INTEGRATION_REPORT.md)）。
 
-校验维度（详见 reference）：构建/类型 → **nilaway 增量门禁**（仅对本次增量代码强制；存量遗留登记不处理）→ 测试 → 接口衔接 → 配置完整 → trace/context → 风格基线一致性 → 遗漏回扫 → 反作弊与状态一致性。
+**范围（强制）**：本阶段只做**本地可独立完成**的校验，不依赖任何线上 / 集成环境。
 
-完成动作：按 [@references/09-phase-gate-protocol.md](references/09-phase-gate-protocol.md) 执行 Gate（含 Phase 5 专用的反作弊核对）。
+- ✅ **本地强制项**：构建/类型 → **nilaway 增量门禁**（仅对增量代码强制；存量遗留登记不处理）→ `go test`（默认 build tag 全通过；外部依赖类测试若跳过需登记原因）→ 静态接口衔接抽样（grep）→ 配置完整 → trace/context 静态抽样 → 风格基线一致性 → 遗漏回扫 → 反作弊与状态一致性。
+- ❌ **不在本 skill 范围**：起服务到"等待请求"的 dry-run 启动校验、灰度/降级/报警端到端验证、K8s rollback 真实演练、连真实下游的 e2e 烟测——交由独立的发布/SRE 流程处理；本阶段对这些项**不出"通过"结论**，只在报告中静态登记代码/配置层面是否落地。
+
+完成动作：按 [@references/09-phase-gate-protocol.md](references/09-phase-gate-protocol.md) 执行 Gate（含 Phase 5 专用的反作弊核对）。本 Gate 的 ✅ approve 含义是"本地校验门禁放行"，不等同于"上线放行"。
 
 ## 状态与产物目录约定
 
@@ -223,6 +226,6 @@ version: 0.3.0
 - [ ] **Phase 1** 产物 `IMPLEMENTATION_SPEC.md`（9 章节齐全）+ `SPEC_COVERAGE.md`（覆盖率 100%）已 approve；§9 风格条款全部沿用 §5.5。
 - [ ] **Phase 2** 产物 `TASKS.md` + `tasks.json` 已 approve；ID 集合一致；通过 `tasks.schema.json`；无禁止字段；满足 200~500 行预估。
 - [ ] **Phase 3/4** 每个 Task 都有完整三件套（`context.md` / `impl_report.md` / `verify_report.md`），无 `attempt ≥ 3 且未通过`，所有偏差落在 `impl_report.md`。
-- [ ] **Phase 5** `INTEGRATION_REPORT.md` 已产出；`go build` / `go vet` / `go test` 全通过；`nilaway ./...` 已运行且**增量报告（`nilaway.incr.txt`）为零**（存量遗留可保留并登记）；遗漏回扫已对照原始方案。
+- [ ] **Phase 5** `INTEGRATION_REPORT.md` 已产出；`go build` / `go vet` / `go test`（默认 build tag）全通过；`nilaway ./...` 已运行且**增量报告（`nilaway.incr.txt`）为零**（存量遗留可保留并登记）；遗漏回扫已对照原始方案；线上动作类需求仅静态登记，不出"通过"结论。
 - [ ] **反作弊核对**（详见 [@references/09-phase-gate-protocol.md](references/09-phase-gate-protocol.md) §反作弊）全部通过。
-- [ ] **最终 Gate**：Phase 5 报告已给用户 review 并收到上线 `✅ approve`。
+- [ ] **最终 Gate**：Phase 5 报告已给用户 review 并收到 `✅ approve`（含义为"本地校验门禁放行"，是否上线由独立发布/SRE 流程裁定）。
