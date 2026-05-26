@@ -4,7 +4,7 @@
 >
 > **禁止字段**（任一命中即不合格）：`工作量` / `工时` / `估时` / `X 天` / `X 人天` / `story point` / `effort` / `estimateHours` / `manDays`。粒度度量只用"代码量预估 + 依赖深度"。
 
-- 来源规格书：`.spec2code/IMPLEMENTATION_SPEC.md`
+- 来源规格书：`.qiqskills/spec2code/IMPLEMENTATION_SPEC.md`
 - 产出时间：{{datetime}}
 - Task 总数：{{N}}，Batch 总数：{{M}}
 

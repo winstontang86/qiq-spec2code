@@ -4,7 +4,7 @@
 
 - **报告时间**：{{datetime}}
 - **覆盖 Task 数**：{{N}}
-- **来源规格书**：`.spec2code/IMPLEMENTATION_SPEC.md`
+- **来源规格书**：`.qiqskills/spec2code/IMPLEMENTATION_SPEC.md`
 - **原始方案路径**：{{...}}
 
 ---
@@ -60,7 +60,7 @@ $ {{golangci-lint run / make lint}}
 执行结果：
 
 ```
-$ nilaway ./... > .spec2code/state/nilaway.raw.txt
+$ nilaway ./... > .qiqskills/spec2code/state/nilaway.raw.txt
 原始报告条数：{{X}}
 增量命中（nilaway.incr.txt）：{{Y}} 行  ← **必须为 0**
 存量遗留（nilaway.legacy.txt）：{{Z}} 行  ← 不阻塞，仅登记
@@ -200,7 +200,7 @@ $ grep -rn "// SPEC_QUESTION:" --include="*.go" .
 
 ```
 $ grep -nE "(工作量|工时|估时|人天|story[ _-]?point|effort|estimateHours|manDays|workload)" \
-    .spec2code/TASKS.md .spec2code/state/tasks.json
+    .qiqskills/spec2code/TASKS.md .qiqskills/spec2code/state/tasks.json
 {{命令输出 / "0 matches"}}
 ```
 

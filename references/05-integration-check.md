@@ -18,9 +18,9 @@
 
 ## 输入
 
-- `.spec2code/IMPLEMENTATION_SPEC.md`
+- `.qiqskills/spec2code/IMPLEMENTATION_SPEC.md`
 - 原始技术方案文档（仅在本阶段允许翻阅，用于回扫遗漏）
-- `.spec2code/state/tasks.json`（确认所有 Task 状态）
+- `.qiqskills/spec2code/state/tasks.json`（确认所有 Task 状态）
 - 整个仓库的代码
 
 ## 校验清单
@@ -51,16 +51,16 @@ go vet ./...
 ```bash
 # 若仓库未安装：go install go.uber.org/nilaway/cmd/nilaway@latest
 # 1) 全仓扫描，落盘原始报告
-nilaway ./... > .spec2code/state/nilaway.raw.txt 2>&1 || true
+nilaway ./... > .qiqskills/spec2code/state/nilaway.raw.txt 2>&1 || true
 
 # 2) 计算 INCR_FILES（示例：用 tasks.json 的产出文件并集；下面用 git diff 兜底）
-git diff --name-only "$BASELINE_COMMIT"..HEAD -- '*.go' > .spec2code/state/incr_files.txt
+git diff --name-only "$BASELINE_COMMIT"..HEAD -- '*.go' > .qiqskills/spec2code/state/incr_files.txt
 
 # 3) 把原始报告按文件路径切分为「增量命中」与「存量遗留」
-grep -F -f .spec2code/state/incr_files.txt .spec2code/state/nilaway.raw.txt \
-  > .spec2code/state/nilaway.incr.txt || true
-grep -v -F -f .spec2code/state/incr_files.txt .spec2code/state/nilaway.raw.txt \
-  > .spec2code/state/nilaway.legacy.txt || true
+grep -F -f .qiqskills/spec2code/state/incr_files.txt .qiqskills/spec2code/state/nilaway.raw.txt \
+  > .qiqskills/spec2code/state/nilaway.incr.txt || true
+grep -v -F -f .qiqskills/spec2code/state/incr_files.txt .qiqskills/spec2code/state/nilaway.raw.txt \
+  > .qiqskills/spec2code/state/nilaway.legacy.txt || true
 ```
 
 判定规则：
@@ -136,7 +136,7 @@ go test ./...
 
 ## Output
 
-按 [@templates/INTEGRATION_REPORT.md](../templates/INTEGRATION_REPORT.md) 的骨架，写入 `.spec2code/INTEGRATION_REPORT.md`。
+按 [@templates/INTEGRATION_REPORT.md](../templates/INTEGRATION_REPORT.md) 的骨架，写入 `.qiqskills/spec2code/INTEGRATION_REPORT.md`。
 
 至少包含：
 
@@ -174,5 +174,5 @@ go test ./...
 - [ ] 风格基线一致性已对照 `REPO_PROFILE.md` §5.5 核对。
 - [ ] **§10 反作弊与状态一致性全部通过**（详见 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) §反作弊核对）。
 - [ ] 总体结论已严格按规则给出（PASS / PASS_WITH_WAIVER / FAIL）。
-- [ ] 报告已写入 `.spec2code/INTEGRATION_REPORT.md`。
+- [ ] 报告已写入 `.qiqskills/spec2code/INTEGRATION_REPORT.md`。
 - [ ] 已按 [@references/09-phase-gate-protocol.md](09-phase-gate-protocol.md) 执行 Phase 5 Gate（含反作弊核对），等待用户最终确认是否进入发布流程。

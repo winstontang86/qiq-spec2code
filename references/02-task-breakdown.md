@@ -9,8 +9,8 @@
 
 ## 输入
 
-- `.spec2code/IMPLEMENTATION_SPEC.md`（来自 Phase 1）
-- `.spec2code/REPO_PROFILE.md`（来自 Phase 0）
+- `.qiqskills/spec2code/IMPLEMENTATION_SPEC.md`（来自 Phase 1）
+- `.qiqskills/spec2code/REPO_PROFILE.md`（来自 Phase 0）
 
 ## 拆分原则
 
@@ -125,7 +125,7 @@ effort / estimateHours / manDays / workload / days / manday / storyPoint / story
 
 ### 2. `tasks.json`（机读）
 
-写入 `.spec2code/state/tasks.json`，符合 [@templates/tasks.schema.json](../templates/tasks.schema.json)。每个 Task 至少包含：
+写入 `.qiqskills/spec2code/state/tasks.json`，符合 [@templates/tasks.schema.json](../templates/tasks.schema.json)。每个 Task 至少包含：
 
 ```json
 {

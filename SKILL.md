@@ -29,7 +29,7 @@ version: 0.3.0
 3. **逐任务闭环**：实现完立即校验，最多重试 3 次仍不通过则停止流水线、上报。
 4. **不擅自发挥**：禁止在规格书之外加功能、改命名、改类型、改错误码；偏差必须显式记录。
 5. **复用胜过新建**：仓库已有的能力、分层、选型一律沿用 `REPO_PROFILE.md` §5.5 风格基线；未提供的项才由规格书显式声明。**不要平地起高楼**。
-6. **可恢复**：所有中间产物落盘到**工作仓库根目录**下的 `.spec2code/`，支持断点续传（"工作仓库"= 用户实际要落地代码的代码仓库，详见 §状态与产物目录约定）。
+6. **可恢复**：所有中间产物落盘到**工作仓库根目录**下的 `.qiqskills/spec2code/`，支持断点续传（"工作仓库"= 用户实际要落地代码的代码仓库，详见 §状态与产物目录约定）。
 
 ## 执行模式（先确认模式再开始）
 
@@ -39,7 +39,7 @@ version: 0.3.0
 |---|---|---|
 | **完整模式（默认）** | 中大型方案、首次实现核心功能、涉及资金/核心链路 | 顺序执行 Phase 0→5；每个 Task 必须 Verifier 校验通过 |
 | **加速模式** | 原型验证、内部工具、用户具备较强人工 review 能力 | Phase 4 校验压缩为 4 个核心维度（结构/数据结构/接口/流程）；**Phase 0/1/2/5 的 Gate 不允许跳过** |
-| **增量续传模式** | `.spec2code/state/tasks.json` 已存在，或用户要求"接着上次的继续" | 跳过 Phase 0~2，直接从未完成 Task 继续 |
+| **增量续传模式** | `.qiqskills/spec2code/state/tasks.json` 已存在，或用户要求"接着上次的继续" | 跳过 Phase 0~2，直接从未完成 Task 继续 |
 
 > 用户没明确说时默认用"完整模式"，并把模式选择告诉用户、允许切换。
 
@@ -61,7 +61,7 @@ version: 0.3.0
 
 ### Phase 0 — 仓库现状扫描（强制）
 
-按 [@references/00-repo-profile.md](references/00-repo-profile.md) 执行，产出 `.spec2code/REPO_PROFILE.md`（基于 [@templates/REPO_PROFILE.md](templates/REPO_PROFILE.md)）。
+按 [@references/00-repo-profile.md](references/00-repo-profile.md) 执行，产出 `.qiqskills/spec2code/REPO_PROFILE.md`（基于 [@templates/REPO_PROFILE.md](templates/REPO_PROFILE.md)）。
 
 关键产出：**§5.5 风格基线表**——后续所有 Phase 的"风格沿用"唯一引用源；以及 nilaway 工具状态（未安装即提示安装或登记降级）。
 
@@ -73,8 +73,8 @@ version: 0.3.0
 
 按 [@references/01-spec-generation.md](references/01-spec-generation.md) 执行，产出：
 
-- `.spec2code/IMPLEMENTATION_SPEC.md`（基于 [@templates/IMPLEMENTATION_SPEC.md](templates/IMPLEMENTATION_SPEC.md)）：必须含 **9 个章节**，任一缺失或表格为空即不合格。
-- `.spec2code/SPEC_COVERAGE.md`（基于 [@templates/SPEC_COVERAGE.md](templates/SPEC_COVERAGE.md)）：方案 §X → 规格书 §Y 映射，**未覆盖项 = 0** 才允许进入 Phase 2。
+- `.qiqskills/spec2code/IMPLEMENTATION_SPEC.md`（基于 [@templates/IMPLEMENTATION_SPEC.md](templates/IMPLEMENTATION_SPEC.md)）：必须含 **9 个章节**，任一缺失或表格为空即不合格。
+- `.qiqskills/spec2code/SPEC_COVERAGE.md`（基于 [@templates/SPEC_COVERAGE.md](templates/SPEC_COVERAGE.md)）：方案 §X → 规格书 §Y 映射，**未覆盖项 = 0** 才允许进入 Phase 2。
 
 §9 编码约束的来源：
 
@@ -89,8 +89,8 @@ version: 0.3.0
 
 按 [@references/02-task-breakdown.md](references/02-task-breakdown.md) 执行，产出双载体：
 
-- 人读：`.spec2code/TASKS.md`（基于 [@templates/TASKS.md](templates/TASKS.md)）
-- 机读：`.spec2code/state/tasks.json`（符合 [@templates/tasks.schema.json](templates/tasks.schema.json)）
+- 人读：`.qiqskills/spec2code/TASKS.md`（基于 [@templates/TASKS.md](templates/TASKS.md)）
+- 机读：`.qiqskills/spec2code/state/tasks.json`（符合 [@templates/tasks.schema.json](templates/tasks.schema.json)）
 
 硬性要求：
 
@@ -111,13 +111,13 @@ version: 0.3.0
 ┌──────────────────────────────────────────────────┐
 │ 1. Coordinator 装配 TASK_CONTEXT.md                │
 │    （任务描述+规格书片段+约束+依赖签名+已完成代码）  │
-│    → .spec2code/tasks/T-XXX/context.md             │
+│    → .qiqskills/spec2code/tasks/T-XXX/context.md             │
 │                                                    │
 │ 2. 调用 Implementer（references/03）               │
-│    → 代码 + .spec2code/tasks/T-XXX/impl_report.md  │
+│    → 代码 + .qiqskills/spec2code/tasks/T-XXX/impl_report.md  │
 │                                                    │
 │ 3. 调用 Verifier（references/04 + 08）             │
-│    → .spec2code/tasks/T-XXX/verify_report.md       │
+│    → .qiqskills/spec2code/tasks/T-XXX/verify_report.md       │
 │                                                    │
 │ 4. 判定                                            │
 │    ├ ✅ Pass / ⚠️ Pass-with-issues                  │
@@ -140,7 +140,7 @@ version: 0.3.0
 
 ### Phase 5 — 集成校验（**本地范围**）
 
-所有 Task 状态变为 `passed` 后执行，按 [@references/05-integration-check.md](references/05-integration-check.md) 执行，产出 `.spec2code/INTEGRATION_REPORT.md`（基于 [@templates/INTEGRATION_REPORT.md](templates/INTEGRATION_REPORT.md)）。
+所有 Task 状态变为 `passed` 后执行，按 [@references/05-integration-check.md](references/05-integration-check.md) 执行，产出 `.qiqskills/spec2code/INTEGRATION_REPORT.md`（基于 [@templates/INTEGRATION_REPORT.md](templates/INTEGRATION_REPORT.md)）。
 
 **范围（强制）**：本阶段只做**本地可独立完成**的校验，不依赖任何线上 / 集成环境。
 
@@ -153,15 +153,15 @@ version: 0.3.0
 
 **位置锚点（强制）**：本 skill 的所有读写操作都以**用户的工作仓库根目录**（即调用 skill 时 shell 的 `pwd`，亦即用户实际要落地代码的代码仓库）为基准。具体含义：
 
-- 所有 `.spec2code/...` 路径一律相对于工作仓库根目录，**禁止**写到 skill 自身目录、临时目录或上级目录。
+- 所有 `.qiqskills/spec2code/...` 路径一律相对于工作仓库根目录，**禁止**写到 skill 自身目录、临时目录或上级目录。
 - Phase 0 扫描的"仓库"= 工作仓库根目录；Phase 3 的代码改动也只发生在该仓库内。
 - 启动时若发现工作目录不像代码仓库（无 `.git/` 且无任何源码 / 构建文件），先与用户确认是否走错目录，确认后再继续。
 - 多仓场景：一次会话只服务一个工作仓库；若需要跨仓，分别启动 skill。
 
-所有中间产物固定写入**工作仓库根目录下的 `.spec2code/`**：
+所有中间产物固定写入**工作仓库根目录下的 `.qiqskills/spec2code/`**：
 
 ```
-.spec2code/
+.qiqskills/spec2code/
 ├── PROGRESS.md                  # 进度面板（人读单一视图，由 tasks.json 派生）
 ├── REPO_PROFILE.md              # Phase 0 产物
 ├── IMPLEMENTATION_SPEC.md       # Phase 1 产物
@@ -179,12 +179,12 @@ version: 0.3.0
 
 ### 进度真源约定（强制）
 
-- `.spec2code/state/tasks.json` 是**唯一**的进度真源（机读）。
-- `.spec2code/PROGRESS.md` 是**唯一**的人读进度面板，必须由 `tasks.json` + Phase 状态派生重写，禁止手工与 tasks.json 同时维护。
+- `.qiqskills/spec2code/state/tasks.json` 是**唯一**的进度真源（机读）。
+- `.qiqskills/spec2code/PROGRESS.md` 是**唯一**的人读进度面板，必须由 `tasks.json` + Phase 状态派生重写，禁止手工与 tasks.json 同时维护。
 - 仓库根 `README.md` 只承载 skill 元信息，**不放跑批进度**。
 - 每个 Phase 完成时按 [@references/09-phase-gate-protocol.md](references/09-phase-gate-protocol.md) 重写 PROGRESS.md。
 
-`.spec2code/` 建议加入 `.gitignore`（除非用户希望把规格书与报告一起提交）。
+`.qiqskills/spec2code/` 建议加入 `.gitignore`（除非用户希望把规格书与报告一起提交）。
 
 ## 红线（Hard Rules — 违反即立即回滚并道歉）
 

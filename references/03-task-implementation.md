@@ -64,7 +64,7 @@
 
 ### Step 3 — `IMPL_REPORT.md`（自检报告）
 
-按 [@templates/IMPL_REPORT.md](../templates/IMPL_REPORT.md) 的骨架填写，写入 `.spec2code/tasks/<Task-ID>/impl_report.md`。包含：
+按 [@templates/IMPL_REPORT.md](../templates/IMPL_REPORT.md) 的骨架填写，写入 `.qiqskills/spec2code/tasks/<Task-ID>/impl_report.md`。包含：
 
 - **任务理解复述**
 - **产出文件清单 + 行数**

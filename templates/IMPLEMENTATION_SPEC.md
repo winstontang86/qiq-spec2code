@@ -5,8 +5,8 @@
 > 本模板共 **9 个必填章节**：任一章节缺失或表格为空 → 不合格 → 不允许进入 Phase 2。
 
 - 来源方案：{{原始方案路径/标题/版本}}
-- 仓库画像：`.spec2code/REPO_PROFILE.md`
-- 覆盖率报告：`.spec2code/SPEC_COVERAGE.md`（与本规格书同步产出）
+- 仓库画像：`.qiqskills/spec2code/REPO_PROFILE.md`
+- 覆盖率报告：`.qiqskills/spec2code/SPEC_COVERAGE.md`（与本规格书同步产出）
 - 产出时间：{{datetime}}
 
 ---
@@ -364,7 +364,7 @@ interfaces/http
 
 ## 9. 编码约束清单
 
-> **核心约束**摘自 [@references/06-coding-constraints-common.md](../references/06-coding-constraints-common.md) 与 [@references/07-coding-constraints-go.md](../references/07-coding-constraints-go.md)；**风格类约束**沿用 `.spec2code/REPO_PROFILE.md` §5.5 风格基线，不在此重复定义。
+> **核心约束**摘自 [@references/06-coding-constraints-common.md](../references/06-coding-constraints-common.md) 与 [@references/07-coding-constraints-go.md](../references/07-coding-constraints-go.md)；**风格类约束**沿用 `.qiqskills/spec2code/REPO_PROFILE.md` §5.5 风格基线，不在此重复定义。
 
 ### 9.1 类型与单位（核心）
 
@@ -445,7 +445,7 @@ interfaces/http
 
 ## ⏸ 等待用户确认
 
-> 本文件为 Phase 1 产物，需经用户 review 通过后方可进入 Phase 2。同时请检查同步产出的 `.spec2code/SPEC_COVERAGE.md` 是否覆盖率 100%。
+> 本文件为 Phase 1 产物，需经用户 review 通过后方可进入 Phase 2。同时请检查同步产出的 `.qiqskills/spec2code/SPEC_COVERAGE.md` 是否覆盖率 100%。
 >
 > 请回复：
 >

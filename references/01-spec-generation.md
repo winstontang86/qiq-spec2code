@@ -9,7 +9,7 @@
 ## 输入
 
 - 已评审通过的技术方案文档（用户提供原文或路径）
-- `.spec2code/REPO_PROFILE.md`（来自 Phase 0）
+- `.qiqskills/spec2code/REPO_PROFILE.md`（来自 Phase 0）
 
 ## 核心原则
 
@@ -149,7 +149,7 @@ Layer 4: interfaces/http, interfaces/consumer
 1. 读取技术方案原文，按章节做信息提取（不要漏掉任何接口、字段、错误码）。
 2. 读取 `REPO_PROFILE.md`，对每一项设计决策检查"是否复用已有 / 是否需要新增"。
 3. 填充 `IMPLEMENTATION_SPEC.md` 模板，逐字段、逐错误码、逐流程精确描述。
-4. **同步产出 `SPEC_COVERAGE.md`**（按 [@templates/SPEC_COVERAGE.md](../templates/SPEC_COVERAGE.md)）到 `.spec2code/SPEC_COVERAGE.md`：逐节、逐表、逐 Redis key、逐时序图、逐故障表项映射到规格书章节。**未覆盖项 = 0** 才允许进入 Phase 2。
+4. **同步产出 `SPEC_COVERAGE.md`**（按 [@templates/SPEC_COVERAGE.md](../templates/SPEC_COVERAGE.md)）到 `.qiqskills/spec2code/SPEC_COVERAGE.md`：逐节、逐表、逐 Redis key、逐时序图、逐故障表项映射到规格书章节。**未覆盖项 = 0** 才允许进入 Phase 2。
 5. **全量回扫自检**（以下逐项核对，缺一项即返工）：
    - [ ] 方案中的每张表都有 DDL（grep `CREATE TABLE` 与方案存储设计节对比）
    - [ ] 方案中的每个 Redis key 都列了（grep 项目前缀）

@@ -1,11 +1,11 @@
 # 规格书覆盖率报告（SPEC_COVERAGE）
 
-> 由 Phase 1 与 `IMPLEMENTATION_SPEC.md` **同步产出**；写入 `.spec2code/SPEC_COVERAGE.md`。
+> 由 Phase 1 与 `IMPLEMENTATION_SPEC.md` **同步产出**；写入 `.qiqskills/spec2code/SPEC_COVERAGE.md`。
 >
 > 一票否决权：**任何"未覆盖"项 → 不允许进入 Phase 2**。
 
 - 来源方案：{{原始方案路径/标题/版本}}
-- 规格书：`.spec2code/IMPLEMENTATION_SPEC.md`
+- 规格书：`.qiqskills/spec2code/IMPLEMENTATION_SPEC.md`
 - 产出时间：{{datetime}}
 
 ---

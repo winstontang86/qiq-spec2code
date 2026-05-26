@@ -8,8 +8,8 @@
 
 ## 输入
 
-- `.spec2code/tasks/<Task-ID>/context.md`（Implementer 看到的上下文，作为校验依据）
-- `.spec2code/tasks/<Task-ID>/impl_report.md`（Implementer 的自检报告）
+- `.qiqskills/spec2code/tasks/<Task-ID>/context.md`（Implementer 看到的上下文，作为校验依据）
+- `.qiqskills/spec2code/tasks/<Task-ID>/impl_report.md`（Implementer 的自检报告）
 - 本次 Task 实际产出的代码文件（按 `outputs` 字段定位）
 
 ## 核心原则
@@ -48,7 +48,7 @@
 
 ## Output
 
-按 [@templates/VERIFY_REPORT.md](../templates/VERIFY_REPORT.md) 的骨架填写，写入 `.spec2code/tasks/<Task-ID>/verify_report.md`。
+按 [@templates/VERIFY_REPORT.md](../templates/VERIFY_REPORT.md) 的骨架填写，写入 `.qiqskills/spec2code/tasks/<Task-ID>/verify_report.md`。
 
 **多轮校验时必须在文件末尾追加 `## Attempt N` 段，禁止覆盖前次内容**；Implementer 重做后下一轮 Verifier 也按此追加。
 

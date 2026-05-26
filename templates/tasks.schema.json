@@ -7,7 +7,7 @@
   "properties": {
     "spec_path": {
       "type": "string",
-      "description": "对应的实现规格书路径，例如 .spec2code/IMPLEMENTATION_SPEC.md"
+      "description": "对应的实现规格书路径，例如 .qiqskills/spec2code/IMPLEMENTATION_SPEC.md"
     },
     "generated_at": {
       "type": "string",
@@ -97,15 +97,15 @@
         },
         "context_path": {
           "type": "string",
-          "description": ".spec2code/tasks/<id>/context.md"
+          "description": ".qiqskills/spec2code/tasks/<id>/context.md"
         },
         "impl_report_path": {
           "type": "string",
-          "description": ".spec2code/tasks/<id>/impl_report.md"
+          "description": ".qiqskills/spec2code/tasks/<id>/impl_report.md"
         },
         "verify_report_path": {
           "type": "string",
-          "description": ".spec2code/tasks/<id>/verify_report.md"
+          "description": ".qiqskills/spec2code/tasks/<id>/verify_report.md"
         }
       },
       "allOf": [

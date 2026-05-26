@@ -8,7 +8,7 @@
 
 ## 输入
 
-- **工作仓库根目录路径**（= 调用 skill 时 shell 的 `pwd`，也是后续 `.spec2code/` 写入的锚点；本阶段所有扫描都限定在该目录内，禁止越界扫描父目录或其它仓库）
+- **工作仓库根目录路径**（= 调用 skill 时 shell 的 `pwd`，也是后续 `.qiqskills/spec2code/` 写入的锚点；本阶段所有扫描都限定在该目录内，禁止越界扫描父目录或其它仓库）
 - （可选）用户提供的关键模块/目录线索
 
 ## 工作步骤
@@ -118,7 +118,7 @@
 
 ## Output
 
-把结果填入 [@templates/REPO_PROFILE.md](../templates/REPO_PROFILE.md) 的所有章节，写入 `.spec2code/REPO_PROFILE.md`。
+把结果填入 [@templates/REPO_PROFILE.md](../templates/REPO_PROFILE.md) 的所有章节，写入 `.qiqskills/spec2code/REPO_PROFILE.md`。
 
 ### Phase 0 完成动作
 

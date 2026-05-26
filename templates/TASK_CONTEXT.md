@@ -33,7 +33,7 @@
 
 ## 5. 相关规格书片段（完整摘录）
 
-> 摘自 `.spec2code/IMPLEMENTATION_SPEC.md`，与本任务相关的章节**完整复制**到下方，不要给链接。
+> 摘自 `.qiqskills/spec2code/IMPLEMENTATION_SPEC.md`，与本任务相关的章节**完整复制**到下方，不要给链接。
 
 ### 5.1 数据结构（来自规格书 §3）
 

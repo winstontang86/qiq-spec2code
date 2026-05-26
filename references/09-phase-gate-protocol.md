@@ -9,8 +9,8 @@
 
 ## 四步法（必须全部执行，顺序不可乱）
 
-1. **写产物**：把当前 Phase 应交付的产物文件全部落盘到 `.spec2code/`（详见各 Phase reference 的"Output"小节）。
-2. **重写 PROGRESS**：按 [@templates/PROGRESS.md](../templates/PROGRESS.md) 重写 `.spec2code/PROGRESS.md`，把当前 Phase 状态置为 `done`，下一阶段置为 `pending（等待 approve）`，并保证 `tasks.json`（如已存在）状态完全一致。
+1. **写产物**：把当前 Phase 应交付的产物文件全部落盘到 `.qiqskills/spec2code/`（详见各 Phase reference 的"Output"小节）。
+2. **重写 PROGRESS**：按 [@templates/PROGRESS.md](../templates/PROGRESS.md) 重写 `.qiqskills/spec2code/PROGRESS.md`，把当前 Phase 状态置为 `done`，下一阶段置为 `pending（等待 approve）`，并保证 `tasks.json`（如已存在）状态完全一致。
 3. **打印摘要**：在对话中向用户展示本阶段产物的核心摘要（路径 + 关键结论），便于快速 review。
 4. **输出 STOP & CONFIRM 段**（见下方模板）并停下，**未收到 ✅ approve 之前禁止调用任何下一阶段的工具**。
 
@@ -39,8 +39,8 @@ Phase 5 完成动作除四步法外，必须额外通过以下核对（任一不
 
 - [ ] grep 全仓 `// SPEC_QUESTION:` 必须为 0 条**未解决**项。
 - [ ] `tasks.json` 中**不存在** `attempt >= 3 且 status != passed/waived` 的 Task。
-- [ ] `.spec2code/PROGRESS.md` 与 `.spec2code/state/tasks.json` 状态完全一致（含 Phase 状态、Task 状态、attempt）。
-- [ ] `.spec2code/SPEC_COVERAGE.md` 未覆盖项 = 0（或所有未覆盖均已显式登记豁免）。
+- [ ] `.qiqskills/spec2code/PROGRESS.md` 与 `.qiqskills/spec2code/state/tasks.json` 状态完全一致（含 Phase 状态、Task 状态、attempt）。
+- [ ] `.qiqskills/spec2code/SPEC_COVERAGE.md` 未覆盖项 = 0（或所有未覆盖均已显式登记豁免）。
 - [ ] `TASKS.md` / `tasks.json` 内**无禁止字段**（`工作量 / 工时 / 估时 / 天数 / 人天 / story point / effort / estimateHours / manDays`）。
 
 ## 违规即回滚
